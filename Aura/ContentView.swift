@@ -8,14 +8,28 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+    @AppStorage("theme_mode") private var themeModeName: String = ThemeMode.system.rawValue
+
+    private var preferredColorScheme: ColorScheme? {
+        switch ThemeMode(rawValue: themeModeName) ?? .system {
+        case .light:  return .light
+        case .dark:   return .dark
+        case .system: return nil
         }
-        .padding()
+    }
+
+    var body: some View {
+        TabView {
+            DashboardView()
+                .tabItem { Label("Dashboard", systemImage: "house.fill") }
+
+            HistoryView()
+                .tabItem { Label("History", systemImage: "calendar") }
+
+            SettingsView()
+                .tabItem { Label("Settings", systemImage: "gearshape.fill") }
+        }
+        .preferredColorScheme(preferredColorScheme)
     }
 }
 
