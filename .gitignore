@@ -1,0 +1,28 @@
+# Xcode
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+xcuserdata/
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.pbxuser
+
+# Build
+build/
+DerivedData/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# CocoaPods (if ever added)
+Pods/
+Podfile.lock
+
+# OS
+.DS_Store
+Aura/GoogleService-Info.plist
