@@ -1,21 +1,28 @@
-//
-//  ContentView.swift
-//  Aura
-//
-//  Created by Eylul Naz Can on 11.04.2026.
-//
-
 import SwiftUI
 
 struct ContentView: View {
     @AppStorage("theme_mode") private var themeModeName: String = ThemeMode.system.rawValue
 
+    @Environment(\.colorScheme) private var systemColorScheme
+
+    private var themeMode: ThemeMode { ThemeMode(rawValue: themeModeName) ?? .system }
+
     private var preferredColorScheme: ColorScheme? {
-        switch ThemeMode(rawValue: themeModeName) ?? .system {
+        switch themeMode {
         case .light:  return .light
         case .dark:   return .dark
         case .system: return nil
         }
+    }
+
+    private var auraColors: AuraColors {
+        let isDark: Bool
+        switch themeMode {
+        case .light:  isDark = false
+        case .dark:   isDark = true
+        case .system: isDark = systemColorScheme == .dark
+        }
+        return isDark ? .dark : .light
     }
 
     var body: some View {
@@ -29,6 +36,7 @@ struct ContentView: View {
             SettingsView()
                 .tabItem { Label("Settings", systemImage: "gearshape.fill") }
         }
+        .environment(\.auraColors, auraColors)
         .preferredColorScheme(preferredColorScheme)
     }
 }
