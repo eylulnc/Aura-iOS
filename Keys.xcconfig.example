@@ -3,3 +3,6 @@
 
 // Found in GoogleService-Info.plist as REVERSED_CLIENT_ID
 REVERSED_CLIENT_ID = com.googleusercontent.apps.YOUR_VALUE_HERE
+
+// Found in GoogleService-Info.plist as CLIENT_ID
+GID_CLIENT_ID = YOUR_CLIENT_ID.apps.googleusercontent.com

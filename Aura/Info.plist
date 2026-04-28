@@ -13,5 +13,7 @@
 			</array>
 		</dict>
 	</array>
+	<key>GIDClientID</key>
+	<string>$(GID_CLIENT_ID)</string>
 </dict>
 </plist>
