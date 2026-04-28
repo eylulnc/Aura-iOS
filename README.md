@@ -10,10 +10,26 @@ Native iOS companion to the [Android app](https://github.com/eylulnc/Aura-Androi
 
 13 moods ranging from negative to positive, each with dedicated light and dark variants.
 
-| | | | | | | |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| Angry | Overwhelmed | Anxious | Sad | Exhausted | Tired | Meh |
-| Calm | Good | Energised | Happy | Excited | Loved | |
+<table>
+  <tr>
+    <td align="center"><img width="56" src="docs/icons/mood_angry.svg" /><br><sub>Angry</sub></td>
+    <td align="center"><img width="56" src="docs/icons/mood_overwhelmed.svg" /><br><sub>Overwhelmed</sub></td>
+    <td align="center"><img width="56" src="docs/icons/mood_anxious.svg" /><br><sub>Anxious</sub></td>
+    <td align="center"><img width="56" src="docs/icons/mood_sad.svg" /><br><sub>Sad</sub></td>
+    <td align="center"><img width="56" src="docs/icons/mood_exhausted.svg" /><br><sub>Exhausted</sub></td>
+    <td align="center"><img width="56" src="docs/icons/mood_tired.svg" /><br><sub>Tired</sub></td>
+    <td align="center"><img width="56" src="docs/icons/mood_meh.svg" /><br><sub>Meh</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img width="56" src="docs/icons/mood_calm.svg" /><br><sub>Calm</sub></td>
+    <td align="center"><img width="56" src="docs/icons/mood_good.svg" /><br><sub>Good</sub></td>
+    <td align="center"><img width="56" src="docs/icons/mood_energised.svg" /><br><sub>Energised</sub></td>
+    <td align="center"><img width="56" src="docs/icons/mood_happy.svg" /><br><sub>Happy</sub></td>
+    <td align="center"><img width="56" src="docs/icons/mood_excited.svg" /><br><sub>Excited</sub></td>
+    <td align="center"><img width="56" src="docs/icons/mood_loved.svg" /><br><sub>Loved</sub></td>
+    <td></td>
+  </tr>
+</table>
 
 <br>
 
