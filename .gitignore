@@ -26,3 +26,4 @@ Podfile.lock
 # OS
 .DS_Store
 Aura/GoogleService-Info.plist
+Keys.xcconfig

@@ -1,0 +1,5 @@
+// Copy this file to Keys.xcconfig and fill in your values.
+// Keys.xcconfig is gitignored and must never be committed.
+
+// Found in GoogleService-Info.plist as REVERSED_CLIENT_ID
+REVERSED_CLIENT_ID = com.googleusercontent.apps.YOUR_VALUE_HERE
