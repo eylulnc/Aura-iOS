@@ -2,8 +2,11 @@ import SwiftUI
 
 struct ContentView: View {
     @AppStorage("theme_mode") private var themeModeName: String = ThemeMode.system.rawValue
+    @AppStorage("onboarding_done") private var hasCompletedOnboarding: Bool = false
 
     @Environment(\.colorScheme) private var systemColorScheme
+
+    @State private var authRepo = AuthRepository()
 
     private var themeMode: ThemeMode { ThemeMode(rawValue: themeModeName) ?? .system }
 
@@ -26,16 +29,21 @@ struct ContentView: View {
     }
 
     var body: some View {
-        TabView {
-            DashboardView()
-                .tabItem { Label("Dashboard", systemImage: "house.fill") }
-
-            HistoryView()
-                .tabItem { Label("History", systemImage: "calendar") }
-
-            SettingsView()
-                .tabItem { Label("Settings", systemImage: "gearshape.fill") }
+        Group {
+            if hasCompletedOnboarding {
+                TabView {
+                    DashboardView()
+                        .tabItem { Label("Dashboard", systemImage: "house.fill") }
+                    HistoryView()
+                        .tabItem { Label("History", systemImage: "calendar") }
+                    SettingsView()
+                        .tabItem { Label("Settings", systemImage: "gearshape.fill") }
+                }
+            } else {
+                OnboardingView()
+            }
         }
+        .environment(authRepo)
         .environment(\.auraColors, auraColors)
         .preferredColorScheme(preferredColorScheme)
     }
