@@ -111,6 +111,11 @@ final class HistoryViewModel {
         guard let context else { return }
         let repo = MoodRepository(context: context)
         try? repo.deleteMood(entry)
+        if entry.date == MoodEntry.todayString(), AppPreferences.shared.notificationsEnabled {
+            let hour = AppPreferences.shared.reminderHour
+            let minute = AppPreferences.shared.reminderMinute
+            Task { await NotificationService.shared.rescheduleToday(hour: hour, minute: minute) }
+        }
     }
 
     // MARK: - Helpers
