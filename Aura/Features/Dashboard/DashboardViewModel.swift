@@ -28,6 +28,9 @@ final class DashboardViewModel {
         guard let context else { return }
         let repo = MoodRepository(context: context)
         try? repo.logMood(moodId: moodId, note: note.isEmpty ? nil : note)
+        if AppPreferences.shared.notificationsEnabled {
+            Task { await NotificationService.shared.cancelToday() }
+        }
         // TODO: refresh widgets (Phase 9)
     }
 

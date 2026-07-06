@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 import FirebaseAuth
 import AuthenticationServices
+import UIKit
 
 struct SettingsView: View {
     @AppStorage("theme_mode") private var themeModeName: String = ThemeMode.system.rawValue
@@ -11,9 +12,15 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.auraColors) private var colors
 
+    @AppStorage("notifications_enabled") private var notificationsEnabled: Bool = false
+    @AppStorage("reminder_hour") private var reminderHour: Int = 20
+    @AppStorage("reminder_minute") private var reminderMinute: Int = 0
+
     @State private var isLoading = false
     @State private var showSignOutConfirm = false
     @State private var showSyncConflict = false
+    @State private var showTimePicker = false
+    @State private var showPermissionDenied = false
     @State private var pendingUserId: String? = nil
     @State private var errorMessage: String? = nil
 
@@ -77,6 +84,54 @@ struct SettingsView: View {
                             }
                         }
 
+                        // Reminders
+                        SettingsGroup(label: "REMINDERS") {
+                            HStack {
+                                Text("Daily reminder")
+                                    .font(.system(size: FontSize.m))
+                                    .foregroundStyle(colors.textPrimary)
+                                Spacer()
+                                Toggle("", isOn: Binding(
+                                    get: { notificationsEnabled },
+                                    set: { enabled in
+                                        if enabled {
+                                            Task { await enableNotifications() }
+                                        } else {
+                                            notificationsEnabled = false
+                                            Task { await NotificationService.shared.cancelAll() }
+                                        }
+                                    }
+                                ))
+                                .tint(colors.accent)
+                                .labelsHidden()
+                            }
+                            .padding(.vertical, Spacing.xs)
+
+                            if notificationsEnabled {
+                                Rectangle()
+                                    .fill(colors.border)
+                                    .frame(height: Spacing.borderWidth)
+                                    .padding(.top, Spacing.s)
+
+                                Button { showTimePicker = true } label: {
+                                    HStack {
+                                        Text("Reminder time")
+                                            .font(.system(size: FontSize.m))
+                                            .foregroundStyle(colors.textPrimary)
+                                        Spacer()
+                                        Text(formattedReminderTime)
+                                            .font(.system(size: FontSize.m))
+                                            .foregroundStyle(colors.textSecondary)
+                                        Image(systemName: "chevron.right")
+                                            .font(.system(size: FontSize.s))
+                                            .foregroundStyle(colors.textSecondary)
+                                    }
+                                    .padding(.vertical, Spacing.m)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+
                         // Data & Privacy
                         SettingsGroup(label: "DATA & PRIVACY") {
                             NavigationLink {
@@ -124,6 +179,23 @@ struct SettingsView: View {
             Button("OK") { errorMessage = nil }
         } message: {
             Text(errorMessage ?? "")
+        }
+        .sheet(isPresented: $showTimePicker) {
+            ReminderTimePickerSheet(hour: reminderHour, minute: reminderMinute) { hour, minute in
+                reminderHour = hour
+                reminderMinute = minute
+                Task { await scheduleNotifications() }
+            }
+        }
+        .alert("Notifications Disabled", isPresented: $showPermissionDenied) {
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("To receive daily reminders, enable notifications for Aura in iOS Settings.")
         }
         .alert("Account Data Found", isPresented: $showSyncConflict) {
             Button("Keep Device Data") {
@@ -180,6 +252,49 @@ struct SettingsView: View {
             }
             isLoading = false
         }
+    }
+
+    // MARK: - Notifications
+
+    private var formattedReminderTime: String {
+        var components = DateComponents()
+        components.hour = reminderHour
+        components.minute = reminderMinute
+        let date = Calendar.current.date(from: components) ?? Date()
+        return date.formatted(date: .omitted, time: .shortened)
+    }
+
+    private func enableNotifications() async {
+        let status = await NotificationService.shared.authorizationStatus()
+        switch status {
+        case .notDetermined:
+            let granted = await NotificationService.shared.requestPermission()
+            if granted {
+                notificationsEnabled = true
+                await scheduleNotifications()
+            } else {
+                notificationsEnabled = false
+            }
+        case .authorized, .provisional, .ephemeral:
+            notificationsEnabled = true
+            await scheduleNotifications()
+        case .denied:
+            notificationsEnabled = false
+            showPermissionDenied = true
+        @unknown default:
+            notificationsEnabled = false
+        }
+    }
+
+    private func scheduleNotifications() async {
+        let userId = authRepo.currentUser?.uid ?? ""
+        let loggedToday = (try? MoodRepository(context: context)
+            .getByDate(MoodEntry.todayString(), userId: userId)) != nil
+        await NotificationService.shared.scheduleAll(
+            hour: reminderHour,
+            minute: reminderMinute,
+            hasLoggedToday: loggedToday
+        )
     }
 }
 
@@ -508,6 +623,56 @@ private struct DataPrivacyView: View {
                 activeAlert = .error(error.localizedDescription)
             }
         }
+    }
+}
+
+// MARK: - Reminder Time Picker Sheet
+
+private struct ReminderTimePickerSheet: View {
+    let onSave: (Int, Int) -> Void
+
+    @State private var date: Date
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.auraColors) private var colors
+
+    init(hour: Int, minute: Int, onSave: @escaping (Int, Int) -> Void) {
+        self.onSave = onSave
+        var components = DateComponents()
+        components.hour = hour
+        components.minute = minute
+        _date = State(initialValue: Calendar.current.date(from: components) ?? Date())
+    }
+
+    var body: some View {
+        VStack(spacing: Spacing.xl) {
+            Text("Reminder Time")
+                .font(.system(size: FontSize.m, weight: .semibold))
+                .foregroundStyle(colors.textPrimary)
+                .padding(.top, Spacing.xxl)
+
+            DatePicker("", selection: $date, displayedComponents: .hourAndMinute)
+                .datePickerStyle(.wheel)
+                .labelsHidden()
+                .padding(.horizontal, Spacing.l)
+
+            Button {
+                let components = Calendar.current.dateComponents([.hour, .minute], from: date)
+                onSave(components.hour ?? 20, components.minute ?? 0)
+                dismiss()
+            } label: {
+                Text("Done")
+                    .font(.system(size: FontSize.m, weight: .medium))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, Spacing.m)
+                    .background(colors.accent)
+                    .clipShape(RoundedRectangle(cornerRadius: Spacing.radiusButton))
+            }
+            .padding(.horizontal, Spacing.l)
+            .padding(.bottom, Spacing.xxl)
+        }
+        .background(colors.background)
+        .presentationDetents([.height(340)])
     }
 }
 

@@ -8,11 +8,13 @@
 import SwiftUI
 import SwiftData
 import FirebaseCore
+import UserNotifications
 
 @main
 struct AuraApp: App {
     init() {
         FirebaseApp.configure()
+        UNUserNotificationCenter.current().delegate = NotificationService.shared
     }
 
     var body: some Scene {
