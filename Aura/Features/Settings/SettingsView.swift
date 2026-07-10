@@ -517,6 +517,21 @@ private struct DataPrivacyView: View {
         ZStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.xl) {
+                    Link(destination: URL(string: "https://eylulnc.github.io/Aura-iOS/privacy-policy")!) {
+                        HStack {
+                            Text("Privacy Policy")
+                                .font(.system(size: FontSize.m))
+                                .foregroundStyle(colors.textPrimary)
+                            Spacer()
+                            Image(systemName: "arrow.up.right")
+                                .font(.system(size: FontSize.s))
+                                .foregroundStyle(colors.textSecondary)
+                        }
+                        .padding(Spacing.l)
+                        .background(colors.surface)
+                        .clipShape(RoundedRectangle(cornerRadius: Spacing.radiusCard))
+                    }
+
                     DestructiveCard(
                         title: "Delete All Data",
                         description: signedInUser != nil
