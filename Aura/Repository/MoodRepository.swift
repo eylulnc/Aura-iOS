@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import FirebaseFirestore
+import WidgetKit
 
 @MainActor
 final class MoodRepository {
@@ -26,6 +27,7 @@ final class MoodRepository {
             try context.save()
             if let uid = syncUserId { Task { await syncToFirestore(entry, userId: uid) } }
         }
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     func editMood(_ entry: MoodEntry, moodId: Int, note: String?, syncUserId: String? = nil) throws {
@@ -34,6 +36,7 @@ final class MoodRepository {
         entry.timestamp = Int64(Date().timeIntervalSince1970 * 1000)
         try context.save()
         if let uid = syncUserId { Task { await syncToFirestore(entry, userId: uid) } }
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     func deleteMood(_ entry: MoodEntry, syncUserId: String? = nil) throws {
@@ -41,11 +44,13 @@ final class MoodRepository {
         context.delete(entry)
         try context.save()
         if let uid = syncUserId { Task { await deleteFromFirestore(entryId: id, userId: uid) } }
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     func deleteAllLocal() throws {
         try context.delete(model: MoodEntry.self)
         try context.save()
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     func deleteAll(syncUserId: String? = nil) throws {
@@ -155,6 +160,7 @@ final class MoodRepository {
             context.insert(entry)
         }
         try? context.save()
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     // MARK: - Helpers
