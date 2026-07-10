@@ -96,6 +96,9 @@ struct DashboardView: View {
         }
         .onAppear { vm.context = context }
         .onChange(of: allEntries.map(\.timestamp), initial: true) { vm.update(entries: allEntries) }
+        .onReceive(NotificationCenter.default.publisher(for: .openMoodLogger)) { _ in
+            if vm.todayEntry == nil { showSheet = true }
+        }
         .sheet(isPresented: $showSheet) {
             LogMoodSheet(
                 initialMoodId: vm.todayEntry?.mood,

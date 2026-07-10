@@ -53,6 +53,13 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .openDashboardTab)) { _ in
             selectedTab = 0
         }
+        .onOpenURL { url in
+            guard url.scheme == "aura" else { return }
+            selectedTab = 0
+            if url.host == "logMood" {
+                NotificationCenter.default.post(name: .openMoodLogger, object: nil)
+            }
+        }
     }
 }
 

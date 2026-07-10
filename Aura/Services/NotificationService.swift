@@ -3,6 +3,7 @@ import Foundation
 
 extension Notification.Name {
     static let openDashboardTab = Notification.Name("openDashboardTab")
+    static let openMoodLogger = Notification.Name("openMoodLogger")
 }
 
 final class NotificationService: NSObject, UNUserNotificationCenterDelegate {

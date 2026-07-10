@@ -21,6 +21,6 @@ struct AuraApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: MoodEntry.self)
+        .modelContainer(AppGroup.sharedModelContainer)
     }
 }
