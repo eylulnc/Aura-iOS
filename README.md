@@ -4,7 +4,8 @@ A minimal mood tracking app, **released on the App Store** and on Google Play. L
 
 This is the native **iOS** app (SwiftUI + SwiftData). It shares a Firebase project with the [Android app](https://github.com/eylulnc/Aura-Android) (Kotlin + Jetpack Compose), so an account syncs across platforms.
 
-Check App Store : [Aura](https://apps.apple.com/de/app/aura-mood-tracker/id6789640136)
+- [Aura - Google Play](https://play.google.com/store/apps/details?id=com.github.eylulnc.aura)
+- [Aura - App Store](https://apps.apple.com/app/aura-mood-tracker/id6789640136)·
 
 ## Screenshots
 
