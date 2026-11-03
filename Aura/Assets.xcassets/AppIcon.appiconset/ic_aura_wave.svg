@@ -1,0 +1,23 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1024" height="1024" rx="230" fill="#F9F8F5"/>
+
+  <!-- Wave 3 — back, lightest -->
+  <path d="M0 620 C120 540, 260 700, 440 620 C600 548, 720 680, 1024 620 L1024 1024 L0 1024 Z"
+        fill="#7B96E8" opacity="0.15"/>
+
+  <!-- Wave 2 — mid -->
+  <path d="M0 560 C140 460, 300 640, 500 540 C660 458, 780 580, 1024 500 L1024 1024 L0 1024 Z"
+        fill="#7B96E8" opacity="0.35"/>
+
+  <!-- Wave 1 — front, full accent -->
+  <path d="M0 660 C130 580, 270 740, 460 660 C620 592, 760 700, 1024 640 L1024 1024 L0 1024 Z"
+        fill="#7B96E8" opacity="0.85"/>
+
+  <!-- Main wave line — top, bold -->
+  <path d="M0 380 C150 290, 290 480, 480 360 C640 260, 780 440, 1024 320"
+        fill="none" stroke="#7B96E8" stroke-width="18" stroke-linecap="round" opacity="0.9"/>
+
+  <!-- Secondary wave line — softer -->
+  <path d="M0 460 C160 375, 320 540, 520 430 C680 338, 820 500, 1024 400"
+        fill="none" stroke="#7B96E8" stroke-width="10" stroke-linecap="round" opacity="0.4"/>
+</svg>
