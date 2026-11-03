@@ -1,10 +1,12 @@
 import SwiftUI
+import FirebaseAuth
 
 struct ContentView: View {
     @AppStorage("theme_mode") private var themeModeName: String = ThemeMode.system.rawValue
     @AppStorage("onboarding_done") private var hasCompletedOnboarding: Bool = false
 
     @Environment(\.colorScheme) private var systemColorScheme
+    @Environment(\.modelContext) private var context
 
     @State private var authRepo = AuthRepository()
     @State private var selectedTab = 0
@@ -49,6 +51,11 @@ struct ContentView: View {
         }
         .environment(authRepo)
         .environment(\.auraColors, auraColors)
+        .task {
+            // Runs once per launch: rescue entries older builds saved unsynced
+            guard hasCompletedOnboarding, let uid = authRepo.currentUser?.uid else { return }
+            await MoodRepository(context: context).adoptOrphanedGuestEntries(userId: uid)
+        }
         .preferredColorScheme(preferredColorScheme)
         .onReceive(NotificationCenter.default.publisher(for: .openDashboardTab)) { _ in
             selectedTab = 0

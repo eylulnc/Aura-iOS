@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import FirebaseAuth
 
 @Observable
 final class DashboardViewModel {
@@ -27,7 +28,13 @@ final class DashboardViewModel {
     func confirmMood(moodId: Int, note: String) {
         guard let context else { return }
         let repo = MoodRepository(context: context)
-        try? repo.logMood(moodId: moodId, note: note.isEmpty ? nil : note)
+        let uid = Auth.auth().currentUser?.uid
+        try? repo.logMood(
+            moodId: moodId,
+            note: note.isEmpty ? nil : note,
+            userId: uid ?? "",
+            syncUserId: uid
+        )
         if AppPreferences.shared.notificationsEnabled {
             Task { await NotificationService.shared.cancelToday() }
         }

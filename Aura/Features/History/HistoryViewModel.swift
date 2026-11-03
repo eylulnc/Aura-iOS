@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import FirebaseAuth
 
 enum SortOrder { case newest, oldest }
 
@@ -104,13 +105,14 @@ final class HistoryViewModel {
     func updateEntry(_ entry: MoodEntry, moodId: Int, note: String) {
         guard let context else { return }
         let repo = MoodRepository(context: context)
-        try? repo.editMood(entry, moodId: moodId, note: note.isEmpty ? nil : note)
+        try? repo.editMood(entry, moodId: moodId, note: note.isEmpty ? nil : note,
+                           syncUserId: Auth.auth().currentUser?.uid)
     }
 
     func deleteEntry(_ entry: MoodEntry) {
         guard let context else { return }
         let repo = MoodRepository(context: context)
-        try? repo.deleteMood(entry)
+        try? repo.deleteMood(entry, syncUserId: Auth.auth().currentUser?.uid)
         if entry.date == MoodEntry.todayString(), AppPreferences.shared.notificationsEnabled {
             let hour = AppPreferences.shared.reminderHour
             let minute = AppPreferences.shared.reminderMinute

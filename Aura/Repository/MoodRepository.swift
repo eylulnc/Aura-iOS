@@ -163,6 +163,32 @@ final class MoodRepository {
         WidgetCenter.shared.reloadAllTimelines()
     }
 
+    // Repair: older builds saved entries as guest ("") while signed in and never
+    // synced them. Adopt those orphans into the signed-in account and upload.
+    // Only call when a user was already signed in at launch — the sign-in flow
+    // handles genuine guest data via checkSyncStateOnLogin.
+    func adoptOrphanedGuestEntries(userId: String) async {
+        let orphans = (try? getAll(userId: "")) ?? []
+        guard !orphans.isEmpty else { return }
+        for orphan in orphans {
+            if let existing = try? getByDate(orphan.date, userId: userId) {
+                // One entry per day: keep whichever was written last
+                if orphan.timestamp > existing.timestamp {
+                    existing.mood = orphan.mood
+                    existing.note = orphan.note
+                    existing.timestamp = orphan.timestamp
+                    await syncToFirestore(existing, userId: userId)
+                }
+                context.delete(orphan)
+            } else {
+                orphan.userId = userId
+                await syncToFirestore(orphan, userId: userId)
+            }
+        }
+        try? context.save()
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
     // MARK: - Helpers
 
     private func userEntries(_ userId: String) -> CollectionReference {
